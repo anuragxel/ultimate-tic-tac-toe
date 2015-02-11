@@ -46,7 +46,7 @@ class Player1:
 			elif old_move[0] % 3 == 0 and old_move[1] in [2, 5, 8]:
 				## top right 3 blocks are allowed
 				blocks_allowed = [1,2,5]
-			elif old_move[0] in [2,5, 8] and old_move[1] % 3 == 0:
+			elif old_move[0] in [2,5, 8] ad old_move[1] % 3 == 0:
 				## bottom left 3 blocks are allowed
 				blocks_allowed  = [3,6,7]
 			elif old_move[0] in [2,5,8] and old_move[1] in [2,5,8]:
