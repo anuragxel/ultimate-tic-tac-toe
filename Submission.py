@@ -1,14 +1,16 @@
+import random
+
 class Player(object):
 	'''
 		Player Class Container.
 	'''
 	def __init__(self):
-		pass
+		self.number_of_moves = 0
 
 	def init(self): #Py3 Compatiblity
 		pass
 
-	def has_won_block(block_number,current_block,our_symbol):
+	def get_status_block(block_number,current_block,our_symbol):
 		has_won = False
 		has_lost = False
 		has_completed = False
@@ -25,10 +27,12 @@ class Player(object):
 		elif block_number == 4:
 			x,y = 3,3
 		elif block_number == 5:
-			x,y = 0,6
+			x,y = 6,3
 		elif block_number == 6:
-			x,y = 3,6
+			x,y = 0,6
 		elif block_number == 7:
+			x,y = 3,6
+		elif block_number == 8:
 			x,y = 6,6
 
 		for i in xrange(x,x+3):
@@ -98,13 +102,23 @@ class Player(object):
 				blocks_allowed = [4]
 		return blocks_allowed
 
+	def get_baseline_allowed_moves(current_board,permitted_blocks,our_symbol):
+		pass
+
+	def return_random_move(possible_moves):
+		return random.choice(possible_moves)
+
+	def is_board_initially_won(board_stat, our_symbol):
+		self.get_status_block(0, board_stat, our_symbol)
+
 	def move(self,current_board,board_stat,opponent_move,our_symbol):
 		'''
 		Parameters - opponent_move - <(a,b)> previous move by opponent; board_stat - <[]> info of blocks won/lost; 
 					current_board - <[]> current board situation; our_symbol
 		Return Value - move- <(row,column)> 
 		'''
-		print "flag"  + flag
+		print "flag "  + flag
 		mvp = raw_input()
 		mvp = mvp.split()
-		return (int(mvp[0]), int(mvp[1]))
+		self.number_of_moves += 1
+		return current_move
