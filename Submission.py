@@ -6,6 +6,8 @@ class Player(object):
 	'''
 	def __init__(self):
 		self.number_of_moves = 0
+		self.actual_board = [[]]
+		self.status_board = []
 
 	def init(self): #Py3 Compatiblity
 		pass
@@ -39,6 +41,7 @@ class Player(object):
 			for j in xrange(y,y+3):
 				if current_block[x][y] == other_symbol or current_block[x][y] == our_symbol:
 					has_completed = True
+
 		if current_block[x][y] == our_symbol and current_block[x + 1][y] == our_symbol and current_block[x + 2][y] == our_symbol:
 			has_won = True
 		elif current_block[x][y + 1] == our_symbol and current_block[x + 1][y + 1] == our_symbol and current_block[x + 2][y + 1] == our_symbol:
@@ -55,6 +58,7 @@ class Player(object):
 			has_won = True
 		elif current_block[x + 2][y] == our_symbol and current_block[x + 1][y + 1] == our_symbol and current_block[x][y + 2] == our_symbol:
 			has_won = True
+		
 		if current_block[x][y] == other_symbol and current_block[x + 1][y] == other_symbol and current_block[x + 2][y] == other_symbol:
 			has_lost = True
 		elif current_block[x][y + 1] == other_symbol and current_block[x + 1][y + 1] == other_symbol and current_block[x + 2][y + 1] == other_symbol:
@@ -109,7 +113,7 @@ class Player(object):
 		return random.choice(possible_moves)
 
 	def is_board_initially_won(board_stat, our_symbol):
-		self.get_status_block(0, board_stat, our_symbol)
+		return self.get_status_block(0, board_stat, our_symbol)
 
 	def move(self,current_board,board_stat,opponent_move,our_symbol):
 		'''
