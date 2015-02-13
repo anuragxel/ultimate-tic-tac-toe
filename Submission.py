@@ -31,7 +31,7 @@ class Player(object):
 		has_won = False
 		has_lost = False
 		has_completed = False
-		x,y = 0,0	
+		first_win=0		#0=none 1=me 2=other 
 		x,y = get_block_coords(block_number)
 
 		our_symbol = self.player_symbol
@@ -44,40 +44,72 @@ class Player(object):
 
 		if current_block[x][y] == our_symbol and current_block[x + 1][y] == our_symbol and current_block[x + 2][y] == our_symbol:
 			has_won = True
+			if first_win==0
+				first_win=1
 		elif current_block[x][y + 1] == our_symbol and current_block[x + 1][y + 1] == our_symbol and current_block[x + 2][y + 1] == our_symbol:
 			has_won = True
+			if first_win==0
+				first_win=1
 		elif current_block[x][y + 2] == our_symbol and current_block[x + 1][y + 2] == our_symbol and current_block[x + 2][y + 2] == our_symbol:
 			has_won = True
+			if first_win==0
+				first_win=1
 		elif current_block[x][y] == our_symbol and current_block[x][y + 1] == our_symbol and current_block[x][y + 2] == our_symbol:
 			has_won = True
+			if first_win==0
+				first_win=1
 		elif current_block[x + 1][y] == our_symbol and current_block[x + 1][y + 1] == our_symbol and current_block[x + 1][y + 2] == our_symbol:
 			has_won = True
+			if first_win==0
+				first_win=1
 		elif current_block[x + 2][y] == our_symbol and current_block[x + 2][y + 1] == our_symbol and current_block[x + 2][y + 2] == our_symbol:
 			has_won = True
+			if first_win==0
+				first_win=1
 		elif current_block[x][y] == our_symbol and current_block[x + 1][y + 1] == our_symbol and current_block[x + 2][y + 2] == our_symbol:
 			has_won = True
+			if first_win==0
+				first_win=1
 		elif current_block[x + 2][y] == our_symbol and current_block[x + 1][y + 1] == our_symbol and current_block[x][y + 2] == our_symbol:
 			has_won = True
+			if first_win==0
+				first_win=1
 		
 		if current_block[x][y] == other_symbol and current_block[x + 1][y] == other_symbol and current_block[x + 2][y] == other_symbol:
 			has_lost = True
+			if first_win==0
+				first_win=-1
 		elif current_block[x][y + 1] == other_symbol and current_block[x + 1][y + 1] == other_symbol and current_block[x + 2][y + 1] == other_symbol:
 			has_lost = True
+			if first_win==0
+				first_win=-1
 		elif current_block[x][y + 2] == other_symbol and current_block[x + 1][y + 2] == other_symbol and current_block[x + 2][y + 2] == other_symbol:
 			has_lost = True
+			if first_win==0
+				first_win=-1
 		elif current_block[x][y] == other_symbol and current_block[x][y + 1] == other_symbol and current_block[x][y + 2] == other_symbol:
 			has_lost = True
+			if first_win==0
+				first_win=-1
 		elif current_block[x + 1][y] == other_symbol and current_block[x + 1][y + 1] == other_symbol and current_block[x + 1][y + 2] == other_symbol:
 			has_lost = True
+			if first_win==0
+				first_win=-1
 		elif current_block[x + 2][y] == other_symbol and current_block[x + 2][y + 1] == other_symbol and current_block[x + 2][y + 2] == other_symbol:
 			has_lost = True
+			if first_win==0
+				first_win=-1
 		elif current_block[x][y] == other_symbol and current_block[x + 1][y + 1] == other_symbol and current_block[x + 2][y + 2] == other_symbol:
 			has_lost = True
+			if first_win==0
+				first_win=-1
 		elif current_block[x + 2][y] == other_symbol and current_block[x + 1][y + 1] == other_symbol and current_block[x][y + 2] == other_symbol:
 			has_lost = True
-		return (has_won, has_lost, has_completed)
+			if first_win==0
+				first_win=-1
+		return (has_completed,first_win)
 
-	def tell_permitted_blocks(self,opponent_move):
+	def get_permitted_blocks(self,opponent_move):
 		blocks_allowed = []
 		for_corner = [ 0, 2, 3, 5, 6, 8 ]
 		if opponent_move[0] in for_corner and opponent_move[1] in for_corner:
@@ -120,7 +152,7 @@ class Player(object):
 					cells.append((i,j))	
 	return cells
 
-	def get_baseline_allowed_moves(self,current_board,permitted_blocks):
+	def get_baseline_allowed_moves(self,current_board,moves): 		#permitted moves(gand bachao)
 		pass
 
 	def return_random_move(self,possible_moves):
@@ -145,11 +177,62 @@ class Player(object):
 					current_board - <[]> current board situation; our_symbol
 		Return Value - move- <(row,column)> 
 		'''
-		bind_symbol(our_symbol)
-		copy_current_board_elems(current_board,board_stat)
-		mvp = raw_input()
-		mvp = mvp.split()
-		self.number_of_moves += 1
-		return current_move
+	#	bind_symbol(our_symbol)
+	#	copy_current_board_elems(current_board,board_stat)
+	#	mvp = raw_input()
+	#	mvp = mvp.split()
+	#	self.number_of_moves += 1
+	#	return current_move
+		blocks_allowed=get_permitted_blocks(opponent_move)
+		cells=get_empty_out_of(blocks_allowed)
+		game_status,game_score=game_completed(current_board,'x')
+		if game_status==9:
+			return game_score #-10||0||10
+		else:
+			alpha=beta=utiity=NULL
+			if our_symbol=='x':
+				for cell in cells:
+					current_board[cell]='x'
+					a=move(self,current_board,board_stat,cell,'o')
+					current_board[cell]='-'
+					if utiity== NULL || utiity<a:
+						utiity=a
+					if utiity > alpha || alpha == NULL:
+						alpha=utiity
+					if alpha> beta && beta != NULL:
+						break
+				return alpha
+			elif our_symbol == 'o':
+				for cell in cells:
+					current_board[cell]='o'
+					a=move(self,current_board,board_stat,cell,'x')
+					current_board[cell]='-'
+					if utiity== NULL || utiity>a:
+						utiity=a
+					if utiity < beta || alpha == NULL:
+						beta=utiity
+					if alpha> beta && beta != NULL:
+						break
+				return beta 
+
 
 # get_empty_out_of(gameboard, permitted_blocks) returns possible_moves
+
+
+
+
+def game_completed(self,current_board,our_symbol):
+	q[]=w[]=0
+	j=0
+	for i in xrange(0,8):
+		q[i],w[i]=get_status_of_block(i,current_block,our_symbol)
+	for i in xrange(0,8):
+		if q[i]==True || w[i]!=0:
+			j++
+	if w[1]+w[2]+w[0]==3 || w[3]+w[4]+w[5]==3 || w[6]+w[7]+w[8]==3 || w[0]+w[3]+w[6]==3 || w[1]+w[4]+w[7]==3 || w[2]+w[5]+w[8]==3 ||w[0]+w[5]+w[8]==3 || w[2]+w[5]+w[7]==3:
+		return (j,10)
+	elif w[1]+w[2]+w[0]==-3 || w[3]+w[4]+w[5]==-3 || w[6]+w[7]+w[8]==-3 || w[0]+w[3]+w[6]==-3 || w[1]+w[4]+w[7]==-3 || w[2]+w[5]+w[8]==-3 ||w[0]+w[5]+w[8]==-3 || w[2]+w[5]+w[7]==-3:
+		return (j,-10)
+	else:
+		return (j,0)
+
