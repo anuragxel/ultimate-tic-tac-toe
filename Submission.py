@@ -186,12 +186,18 @@ class Player(object):
 	def copy_current_board_elems(self,current_board,board_stat):
 		self.actual_board = current_board[:]
 		self.status_board = board_stat[:]
+		
+	def heuristic_score():
+		# Do stuff using self.actual_board here.
+		return 1
 
-	def min_max_with_alpha_beta_pruning(self,opponent_move,our_symbol):
+	def min_max_with_alpha_beta_pruning(self,opponent_move,our_symbol,depth):
 		blocks_allowed = self.get_permitted_blocks(opponent_move)
 		cells = self.get_empty_out_of(blocks_allowed)
 		game_status,game_score = self.game_completed(self.actual_board,'x')
-		if game_status == 9: # Terminal Condition
+		if depth <= 0:
+			return ((-1,-1),heuristic_score());
+		elif game_status == 9: # Terminal Condition
 			return ((-1,-1),game_score) #-10or0or10 and move that can't be made
 		else:
 			alpha=beta=utility=((-1,-1), float("nan"))
@@ -199,7 +205,7 @@ class Player(object):
 				for cell in cells:
 					x,y = cell
 					self.actual_board[x][y] = 'x'
-					child = self.min_max_with_alpha_beta_pruning(cell,'o')
+					child = self.min_max_with_alpha_beta_pruning(cell,'o',depth-1)
 					self.actual_board[x][y] = '-'
 					if utility[1] == float("nan") or utility[1] < child[1]:
 						utility = (cell,child[1])
@@ -212,7 +218,7 @@ class Player(object):
 				for cell in cells:
 					x,y = cell
 					self.actual_board[x][y] = 'o'
-					child = self.min_max_with_alpha_beta_pruning(cell,'x')
+					child = self.min_max_with_alpha_beta_pruning(cell,'x',depth-1)
 					self.actual_board[x][y] = '-'
 					if utility[1] == float("nan") or utility[1] > child[1]:
 						utility = (cell,child[1])
@@ -230,5 +236,5 @@ class Player(object):
 		'''
 		self.bind_symbol(our_symbol)
 		self.copy_current_board_elems(current_board,board_stat)
-		move,value = self.min_max_with_alpha_beta_pruning(opponent_move,self.player_symbol)
+		move,value = self.min_max_with_alpha_beta_pruning(opponent_move,self.player_symbol,4)
 		return move

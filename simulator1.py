@@ -1,7 +1,7 @@
 import sys
 import random
 import signal
-
+from Submission import Player as Player1 
 #Timer handler, helper function
 
 class TimedOutExc(Exception):
