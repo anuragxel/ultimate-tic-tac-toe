@@ -14,12 +14,10 @@
 import sys
 import random
 import numpy as np
+
 from_file=np.genfromtxt("foo.csv",delimiter=",")
 all_state=np.array(from_file).tolist()
 states = {}
-
-# for i in from_file:
-#     all_state.append(i)
 
 
 INFINITY=99999999
