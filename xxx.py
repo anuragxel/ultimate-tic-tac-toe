@@ -330,7 +330,7 @@ def main():
             curplayer = Board.X
 
 if __name__ == "__main__":
-    iterations = 100
+    iterations = 500
     while iterations:
         main()
         iterations -= 1
