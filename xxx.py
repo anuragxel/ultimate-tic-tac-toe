@@ -11,13 +11,18 @@
 # This software is hereby granted to the Public Domain
 #
 
-import sys
+import sys,os
 import random
 import numpy as np
+import json
 
-from_file=np.genfromtxt("foo.csv",delimiter=",")
-all_state=np.array(from_file).tolist()
-states = {}
+# from_file=np.genfromtxt("foo.csv",delimiter=",")
+# all_state=np.array(from_file).tolist()
+# print states
+
+
+# for i in from_file:
+#     all_state.append(i)
 
 
 INFINITY=99999999
@@ -26,14 +31,22 @@ def numStr(n):
     if n == INFINITY: return "+INFINITY"
     elif n == -INFINITY: return "-INFINITY"
     return str(n)
+
 def write_to_file():
-    final_add = []
-    print states
-    # print all_state
-    for e in all_state:
-        if e not in final_add:
-            final_add.append(e) 
-    np.savetxt("foo.csv",final_add,delimiter=",")
+    global states
+    global f
+    json.dump(states,f)
+    f.close()
+    #print states
+
+    # final_add = []
+    # # print states
+    # # print all_state
+    # print to_print
+    # for e in all_state:
+    #     if e not in final_add:
+    #         final_add.append(e) 
+    # np.savetxt("foo.csv",final_add,delimiter=",")
 
 #-------------------------------------------------------------------
 
@@ -102,11 +115,12 @@ class MinMax(object):
 
 
             
-            print("Best score: %s    Candidate moves: %s" % (numStr(alpha), candidate))
+            #print("Best score: %s    Candidate moves: %s" % (numStr(alpha), candidate))
             self.bestmove = random.choice(candidate)
-            all_state.append(self.bestmove)
+            # all_state.append(self.bestmove)
             board_state=playboard.get_board_values()
-            states[board_state]=self.bestmove
+            states[board_state]=self.bestmove            
+
 
         return alpha
 
@@ -239,67 +253,84 @@ class Board(list):
 # MAIN:
 
 # make the real board we'll be using
-board = Board()
+
+def main():
+    global f
+    global states
+    f = open('foo.csv','r+')
+    if os.stat("foo.csv").st_size != 0:
+        states = json.load(f)
+        f.close()
+        open('foo.csv', 'w').close()
+        f  = open('foo.csv','rw+')
+    else:
+        states = {}
+
+    board = Board()
 
 # attach it to a MinMax tree generator/evaluator, max depth 6:
-mm = MinMax(6)
+    mm = MinMax(6)
 
-sys.stdout.write("Who's first? (H)uman or (C)omputer? ")
-sys.stdout.flush()
-first = sys.stdin.readline().strip().lower()[0]
+    #sys.stdout.write("Who's first? (H)uman or (C)omputer? ")
+    #sys.stdout.flush()
+    #first = sys.stdin.readline().strip().lower()[0]
+    first = random.choice(['h','c'])
+    if first == 'h':
+        curplayer = Board.O   # human
+    else:
+        curplayer = Board.X   # computer
 
-if first == 'h':
-    curplayer = Board.O   # human
-else:
-    curplayer = Board.X   # computer
+    done = False
 
-done = False
+    #sys.stdout.write("%s\n" % board)
 
-sys.stdout.write("%s\n" % board)
+    while not done:
+        if board.full(): #DRAW
+            done = True
+        # print all_state
+            write_to_file()
+            #sys.stdout.write("Tie game!\n")
+            continue
 
-while not done:
-    if board.full():
-        done = True
-        print all_state
-        write_to_file()
-        sys.stdout.write("Tie game!\n")
-        continue
-
-    if curplayer == Board.X:
-        sys.stdout.write("Computer is thinking...\n")
+        if curplayer == Board.X:
+            #sys.stdout.write("Computer is thinking...\n")
 
         # run the minmax tree for the current board
-        move = mm.buildtree(board, curplayer)
+            move = mm.buildtree(board, curplayer)
 
-        sys.stdout.write("Computer's move: %s\n" % move)
+            #sys.stdout.write("Computer's move: %s\n" % move)
 
-    else:
-        badMove = True
-        while badMove:
-            sys.stdout.write("Enter a move: ");
-            sys.stdout.flush();
-            move = int(sys.stdin.readline())
-            badMove = move < 0 or move > 8 or board[move] != Board.NONE
+        else:
+            badMove = True
+            while badMove:
+                #sys.stdout.write("Enter a move: ");
+                sys.stdout.flush();
+                #move = int(sys.stdin.readline())
+                move = random.choice([0,1,2,3,4,5,6,7,8])
+                badMove = move < 0 or move > 8 or board[move] != Board.NONE
 
-    if move >= 0:
-        board.move(curplayer, move)
-
-        sys.stdout.write("%s\n" % board)
-
-        winner = board.getWinner()
-
-        if winner == Board.X:
-            write_to_file()
-            sys.stdout.write("X wins!\n")
-            done = True
-        elif winner == Board.O:
-            write_to_file()
-            sys.stdout.write("O wins!\n")
-            done = True
+        if move >= 0:
+            board.move(curplayer, move)
+            #sys.stdout.write("%s\n" % board)
+            winner = board.getWinner()
+            if winner == Board.X:
+                write_to_file()
+             #   sys.stdout.write("X wins!\n")
+                done = True
+            elif winner == Board.O:
+                write_to_file()
+              #  sys.stdout.write("O wins!\n")
+                done = True
 
     # switch to other player:
 
-    if curplayer == Board.X:
-        curplayer = Board.O
-    else:
-        curplayer = Board.X
+        if curplayer == Board.X:
+            curplayer = Board.O
+        else:
+            curplayer = Board.X
+
+if __name__ == "__main__":
+    iterations = 100
+    while iterations:
+        main()
+        iterations -= 1
