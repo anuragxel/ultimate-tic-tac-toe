@@ -54,19 +54,14 @@ class MinMax(object):
     def __init__(self, maxdepth=INFINITY):
         self.bestmove = -1
         self.maxdepth = maxdepth
-
     def _buildtree_r(self, playboard, curplayer, depth):
         """Recursively build the minmax tree."""
-
         # figure out the value of the board:
-
         if depth > self.maxdepth: return 0 # who knows what the future holds
-
         if curplayer == Board.X:
             otherplayer = Board.O
         else:
             otherplayer = Board.X
-
         winner = playboard.getWinner()
         if winner == curplayer:
             return INFINITY
@@ -74,56 +69,39 @@ class MinMax(object):
             return -INFINITY
         elif playboard.full():
             return 0   # tie game
-
         # get a list of possible moves
         movelist = playboard.getCandidateMoves()
-
         alpha = -INFINITY
-
         # for all the moves, recursively rate the subtrees, and
         # keep all the results along with the best move:
-
         salist = []
-
         for i in movelist:
             # make a copy of the board to mess with
             board2 = playboard.copy()
             board2.move(curplayer, i)  # make the speculative move
-
             subalpha = -self._buildtree_r(board2, otherplayer, depth+1)
             if alpha < subalpha:
                 alpha = subalpha;
-
             # keep a parallel array to the movelist that shows all the
             # subtree values--we'll chose at random one of the best for
             # our actual move:
             if depth == 0: salist.append(subalpha)
-
         # if we're at depth 0 and we've explored all the subtrees,
         # it's time to look at the list of moves, gather the ones
         # with the best values, and then choose one at random
         # as our "best move" to actually really play:
-
         if depth == 0:
             candidate = []
             board_state=''
             for i in range(len(salist)):
                 if salist[i] == alpha:
-                    candidate.append(movelist[i])
-
-
-
-
-            
+                    candidate.append(movelist[i]) 
             #print("Best score: %s    Candidate moves: %s" % (numStr(alpha), candidate))
             self.bestmove = random.choice(candidate)
             # all_state.append(self.bestmove)
             board_state=playboard.get_board_values()
-            states[board_state]=self.bestmove            
-
-
+            states[board_state]=self.bestmove
         return alpha
-
     def buildtree(self, board, curplayer):
         self.bestmove = -1
         alpha = self._buildtree_r(board, curplayer, 0)
@@ -294,10 +272,12 @@ def main():
 
         if curplayer == Board.X:
             #sys.stdout.write("Computer is thinking...\n")
-
         # run the minmax tree for the current board
-            move = mm.buildtree(board, curplayer)
-
+            #if board.get_board_values() in states:
+            if board.get_board_values() in states and random.choice([True,True,False,True,False]):
+                move = states[board.get_board_values()]
+            else:
+                move = mm.buildtree(board, curplayer)
             #sys.stdout.write("Computer's move: %s\n" % move)
 
         else:
@@ -330,7 +310,7 @@ def main():
             curplayer = Board.X
 
 if __name__ == "__main__":
-    iterations = 2000
+    iterations = 5000
     while iterations:
         main()
         iterations -= 1

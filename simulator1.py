@@ -5,7 +5,7 @@ from Submission import Player as Player1
 #Timer handler, helper function
 
 class TimedOutExc(Exception):
-	pass
+        pass
 
 def handler(signum, frame):
     #print 'Signal handler called with signal', signum
@@ -21,7 +21,7 @@ class Manual_player:
 		mvp = mvp.split()
 		return (int(mvp[0]), int(mvp[1]))
 		
-'''
+"""
 class Player1:
 	
 	def __init__(self):
@@ -73,13 +73,13 @@ class Player1:
 			elif old_move[0] in [1,4,7] and old_move[1] in [1,4,7]:
 				blocks_allowed = [4]
 
-		for i in reversed(blocks_allowed):
-		    if temp_block[i] != '-':
-			blocks_allowed.remove(i)
+                for i in reversed(blocks_allowed):
+                    if temp_block[i] != '-':
+                        blocks_allowed.remove(i)
 	# We get all the empty cells in allowed blocks. If they're all full, we get all the empty cells in the entire board.
 		cells = get_empty_out_of(temp_board, blocks_allowed,temp_block)
 		return cells[random.randrange(len(cells))]
-'''
+"""
 
 class Player2:
 	
@@ -128,10 +128,10 @@ class Player2:
 				blocks_allowed = [5]
 			elif old_move[0] in [1,4,7] and old_move[1] in [1,4,7]:
 				blocks_allowed = [4]
-		
-		for i in reversed(blocks_allowed):
-		    if temp_block[i] != '-':
-			blocks_allowed.remove(i)
+                
+                for i in reversed(blocks_allowed):
+                    if temp_block[i] != '-':
+                        blocks_allowed.remove(i)
 
 	# We get all the empty cells in allowed blocks. If they're all full, we get all the empty cells in the entire board.
 		cells = get_empty_out_of(temp_board,blocks_allowed,temp_block)
@@ -171,8 +171,8 @@ def get_empty_out_of(gameb, blal,block_stat):
 	if cells == []:
 		for i in range(9):
 			for j in range(9):
-				no = (i/3)*3
-				no += (j/3)
+                                no = (i/3)*3
+                                no += (j/3)
 				if gameb[i][j] == '-' and block_stat[no] == '-':
 					cells.append((i,j))	
 	return cells
@@ -248,19 +248,20 @@ def check_valid_move(game_board,block_stat, current_move, old_move):
 		elif old_move[0] in [1,4,7] and old_move[1] in [1,4,7]:
 			blocks_allowed = [4]
 
-	#Check if the block is won, or completed. If so you cannot move there. 
-	for i in reversed(blocks_allowed):
-		if block_stat[i] != '-':
-			blocks_allowed.remove(i)
-	
-	# We get all the empty cells in allowed blocks. If they're all full, we get all the empty cells in the entire board.
-	cells = get_empty_out_of(game_board, blocks_allowed,block_stat)
+        #Check if the block is won, or completed. If so you cannot move there. 
+
+        for i in reversed(blocks_allowed):
+            if block_stat[i] != '-':
+                blocks_allowed.remove(i)
+        
+        # We get all the empty cells in allowed blocks. If they're all full, we get all the empty cells in the entire board.
+        cells = get_empty_out_of(game_board, blocks_allowed,block_stat)
 
 	#Checks if you made a valid move. 
-	if current_move in cells:
-	    return True
-	else:
-	    return False
+        if current_move in cells:
+     	    return True
+        else:
+    	    return False
 
 def update_lists(game_board, block_stat, move_ret, fl):
 	#move_ret has the move to be made, so we modify the game_board, and then check if we need to modify block_stat
@@ -277,42 +278,42 @@ def update_lists(game_board, block_stat, move_ret, fl):
 		if game_board[id1*3+2][id2*3] == game_board[id1*3+1][id2*3+1] and game_board[id1*3+1][id2*3+1] == game_board[id1*3][id2*3 + 2] and game_board[id1*3+1][id2*3+1] != '-':
 			mflg=1
 		
-		if mflg != 1:
-		    for i in range(id2*3,id2*3+3):
-			if game_board[id1*3][i]==game_board[id1*3+1][i] and game_board[id1*3+1][i] == game_board[id1*3+2][i] and game_board[id1*3][i] != '-':
-				mflg = 1
-				break
+                if mflg != 1:
+                    for i in range(id2*3,id2*3+3):
+                        if game_board[id1*3][i]==game_board[id1*3+1][i] and game_board[id1*3+1][i] == game_board[id1*3+2][i] and game_board[id1*3][i] != '-':
+                                mflg = 1
+                                break
 
-		### row-wise
+                ### row-wise
 		if mflg != 1:
-		    for i in range(id1*3,id1*3+3):
-			if game_board[i][id2*3]==game_board[i][id2*3+1] and game_board[i][id2*3+1] == game_board[i][id2*3+2] and game_board[i][id2*3] != '-':
-				mflg = 1
-				break
+                    for i in range(id1*3,id1*3+3):
+                        if game_board[i][id2*3]==game_board[i][id2*3+1] and game_board[i][id2*3+1] == game_board[i][id2*3+2] and game_board[i][id2*3] != '-':
+                                mflg = 1
+                                break
 
 	
 	if mflg == 1:
 		block_stat[block_no] = fl
 	
-	#check for draw on the block.
+        #check for draw on the block.
 
-	id1 = block_no/3
+        id1 = block_no/3
 	id2 = block_no%3
-	cells = []
+        cells = []
 	for i in range(id1*3,id1*3+3):
 	    for j in range(id2*3,id2*3+3):
 		if game_board[i][j] == '-':
 		    cells.append((i,j))
 
-	if cells == [] and mflg!=1:
-	    block_stat[block_no] = 'd' #Draw
-	
-	return
+        if cells == [] and mflg!=1:
+            block_stat[block_no] = 'd' #Draw
+        
+        return
 
 def terminal_state_reached(game_board, block_stat):
 	
-	#Check if game is won!
-	bs = block_stat
+        #Check if game is won!
+        bs = block_stat
 	## Row win
 	if (bs[0] == bs[1] and bs[1] == bs[2] and bs[1]!='-' and bs[1]!='d') or (bs[3]!='d' and bs[3]!='-' and bs[3] == bs[4] and bs[4] == bs[5]) or (bs[6]!='d' and bs[6]!='-' and bs[6] == bs[7] and bs[7] == bs[8]):
 		print block_stat
@@ -333,39 +334,39 @@ def terminal_state_reached(game_board, block_stat):
 					smfl = 1
 					break
 		if smfl == 1:
-			#Game is still on!
+                        #Game is still on!
 			return False, 'Continue'
 		
 		else:
-			#Changed scoring mechanism
-			# 1. If there is a tie, player with more boxes won, wins.
-			# 2. If no of boxes won is the same, player with more corner move, wins. 
-			point1 = 0
-			point2 = 0
-			for i in block_stat:
-			    if i == 'x':
-				point1+=1
-			    elif i=='o':
-				point2+=1
+                        #Changed scoring mechanism
+                        # 1. If there is a tie, player with more boxes won, wins.
+                        # 2. If no of boxes won is the same, player with more corner move, wins. 
+                        point1 = 0
+                        point2 = 0
+                        for i in block_stat:
+                            if i == 'x':
+                                point1+=1
+                            elif i=='o':
+                                point2+=1
 			if point1>point2:
 				return True, 'P1'
 			elif point2>point1:
 				return True, 'P2'
 			else:
-				point1 = 0
-				point2 = 0
-				for i in range(len(game_board)):
-				    for j in range(len(game_board[i])):
-					if i%3!=1 and j%3!=1:
-					    if game_board[i][j] == 'x':
-						point1+=1
-					    elif game_board[i][j]=='o':
-						point2+=1
-				if point1>point2:
+                                point1 = 0
+                                point2 = 0
+                                for i in range(len(game_board)):
+                                    for j in range(len(game_board[i])):
+                                        if i%3!=1 and j%3!=1:
+                                            if game_board[i][j] == 'x':
+                                                point1+=1
+                                            elif game_board[i][j]=='o':
+                                                point2+=1
+			        if point1>point2:
 				    return True, 'P1'
-				elif point2>point1:
+			        elif point2>point1:
 				    return True, 'P2'
-				else:
+                                else:
 				    return True, 'D'	
 
 
@@ -421,8 +422,8 @@ def simulate(obj1,obj2):
 	WINNER = ''
 	MESSAGE = ''
 
-	#Make your move in 6 seconds!
-	TIMEALLOWED = 60
+        #Make your move in 6 seconds!
+	TIMEALLOWED = 6
 
 	print_lists(game_board, block_stat)
 
@@ -443,7 +444,7 @@ def simulate(obj1,obj2):
 			break
 		signal.alarm(0)
 	
-		#Checking if list hasn't been modified! Note: Do not make changes in the lists passed in move function!
+                #Checking if list hasn't been modified! Note: Do not make changes in the lists passed in move function!
 		if not (verification_fails_board(game_board, temp_board_state) and verification_fails_block(block_stat, temp_block_stat)):
 			#Player1 loses - he modified something
 			WINNER, MESSAGE = decide_winner_and_get_message('P1', 'L',   'MODIFIED CONTENTS OF LISTS')
@@ -458,8 +459,8 @@ def simulate(obj1,obj2):
 
 		print "Player 1 made the move:", ret_move_pl1, 'with', pl1_fl
 
-		#So if the move is valid, we update the 'game_board' and 'block_stat' lists with move of pl1
-		update_lists(game_board, block_stat, ret_move_pl1, pl1_fl)
+                #So if the move is valid, we update the 'game_board' and 'block_stat' lists with move of pl1
+                update_lists(game_board, block_stat, ret_move_pl1, pl1_fl)
 
 		# Checking if the last move resulted in a terminal state
 		gamestatus, mesg =  terminal_state_reached(game_board, block_stat)
@@ -472,39 +473,39 @@ def simulate(obj1,obj2):
 		old_move = ret_move_pl1
 		print_lists(game_board, block_stat)
 
-		# Now player2 plays
+                # Now player2 plays
 
-		temp_board_state = game_board[:]
-		temp_block_stat = block_stat[:]
+                temp_board_state = game_board[:]
+                temp_block_stat = block_stat[:]
 
 
 		signal.signal(signal.SIGALRM, handler)
 		signal.alarm(TIMEALLOWED)
 		try:
-			ret_move_pl2 = pl2.move(temp_board_state, temp_block_stat, old_move, pl2_fl)
+                	ret_move_pl2 = pl2.move(temp_board_state, temp_block_stat, old_move, pl2_fl)
 		except TimedOutExc as e:
 			WINNER, MESSAGE = decide_winner_and_get_message('P2', 'L',   'TIMED OUT')
 			break
 		signal.alarm(0)
 
-		if not (verification_fails_board(game_board, temp_board_state) and verification_fails_block(block_stat, temp_block_stat)):
+                if not (verification_fails_board(game_board, temp_board_state) and verification_fails_block(block_stat, temp_block_stat)):
 			WINNER, MESSAGE = decide_winner_and_get_message('P2', 'L',   'MODIFIED CONTENTS OF LISTS')
 			break
 			
-		if not check_valid_move(game_board, block_stat,ret_move_pl2, old_move):
+                if not check_valid_move(game_board, block_stat,ret_move_pl2, old_move):
 			WINNER, MESSAGE = decide_winner_and_get_message('P2', 'L',   'MADE AN INVALID MOVE')
 			break
 
 
 		print "Player 2 made the move:", ret_move_pl2, 'with', pl2_fl
-		
-		update_lists(game_board, block_stat, ret_move_pl2, pl2_fl)
+                
+                update_lists(game_board, block_stat, ret_move_pl2, pl2_fl)
 
 		gamestatus, mesg =  terminal_state_reached(game_board, block_stat)
-		if gamestatus == True:
+                if gamestatus == True:
 			print_lists(game_board, block_stat)
-			WINNER, MESSAGE = decide_winner_and_get_message('P2', mesg,  'COMPLETE' )
-			break
+                        WINNER, MESSAGE = decide_winner_and_get_message('P2', mesg,  'COMPLETE' )
+                        break
 		old_move = ret_move_pl2
 		print_lists(game_board, block_stat)
 	
@@ -523,7 +524,11 @@ if __name__ == '__main__':
  
 	obj1 = ''
 	obj2 = ''
-	option = sys.argv[1]	
+	try:
+		option = sys.argv[1]		
+	except:
+		option = '1'
+	
 	if option == '1':
 		obj1 = Player1()
 		obj2 = Player2()
@@ -534,11 +539,11 @@ if __name__ == '__main__':
 	elif option == '3':
 		obj1 = Manual_player()
 		obj2 = Manual_player()
-	
-	# Deciding player1 / player2 after a coin toss
-	# However, in the tournament, each player will get a chance to go 1st. 
-	num = random.uniform(0,1)
-	if num > 0.5:
+        
+        # Deciding player1 / player2 after a coin toss
+        # However, in the tournament, each player will get a chance to go 1st. 
+        num = random.uniform(0,1)
+        if num > 0.5:
 		simulate(obj2, obj1)
 	else:
 		simulate(obj1, obj2)
