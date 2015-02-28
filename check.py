@@ -1,5 +1,5 @@
 import json
 
-f = open("foo.csv")
+f = open("new.csv")
 dick = json.load(f)
 print len(dick)
