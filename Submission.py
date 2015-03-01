@@ -5,10 +5,8 @@ class Player(object):
         Player Class Container.
     '''
     def __init__(self):
-        self.H_O = 0
-        self.H_X = 0
-        self.h_o = [0,0,0,0,0,0,0,0,0]
-        self.h_x = [0,0,0,0,0,0,0,0,0]
+        self.H = 0
+        self.h = [0,0,0,0,0,0,0,0,0]
         self.number_of_moves = 0
         self.player_symbol = None
         self.opponent_symbol = None
@@ -208,8 +206,91 @@ class Player(object):
         self.actual_board = current_board[:]
         self.status_board = board_stat[:]
         
-    def heuristic_score(self):
-        return random.randint(-10,10)
+    def heuristic_score(self,board):
+        #return random.randint(-10,10)
+        """
+        Computes heuristic_score for the passed board configuration
+        """
+        #Calculate h values for each small board
+        winnable_x = [8,8,8,8,8,8,8,8,8]
+        winnable_o = [8,8,8,8,8,8,8,8,8]
+
+        for index in xrange(9):
+            block_coords = self.get_block_coords(index)
+            x = block_coords[0]
+            y = block_coords[1]
+            
+            #Bad code but can't think of any better atm :/
+            #4 corners
+            if board[x][y] == 'x':
+                winnable_o[index] -= 3
+            elif board[x][y] == 'o':
+                winnable_x[index] -= 3
+            if board[x+2][y] == 'x':
+                winnable_o[index] -= 3
+            elif board[x+2][y] == 'o':
+                winnable_x[index] -= 3
+            if board[x][y+2] == 'x':
+                winnable_o[index] -= 3
+            elif board[x][y+2] == 'o':
+                winnable_x[index] -= 3
+            if board[x+2][y+2] == 'x':
+                winnable_o[index] -= 3
+            elif board[x+2][y+2] == 'o':
+                winnable_x[index] -= 3
+            #4 sides
+            if board[x+1][y] == 'x':
+                winnable_o[index] -= 2
+            elif board[x+1][y] == 'o':
+                winnable_x[index] -= 2
+            if board[x][y+1] == 'x':
+                winnable_o[index] -= 2
+            elif board[x][y+1] == 'o':
+                winnable_x[index] -= 2
+            if board[x+2][y+1] == 'x':
+                winnable_o[index] -= 2
+            elif board[x+2][y+1] == 'o':
+                winnable_x[index] -= 2
+            if board[x+1][y+2] == 'x':
+                winnable_o[index] -= 2
+            elif board[x+1][y+2] == 'o':
+                winnable_x[index] -= 2
+            #Center
+            if board[x+1][y+1] == 'x':
+                winnable_o[index] -= 4
+            elif board[x+1][y+1] == 'o':
+                winnable_x[index] -= 4
+
+        #Populate h list
+        h_list = []
+        for index in xrange(9):
+            h_list.append( winnable_x[index] - winnable_o[index] )
+
+        #Calculate H using h values
+        winnable_X = 8 #Winnable lines for X on bigger board
+        winnable_O = 8 #Winnable lines for O on bigger board
+        for index in xrange(9):
+            if index in [0,2,6,8]:
+                #Corner
+                if h_list[index] > 0:
+                    winnable_O -= 3
+                elif h_list[index] < 0:
+                    winnable_X -= 3
+            elif index in [1,3,5,7]:
+                #Side
+                if h_list[index] > 0:
+                    winnable_O -= 2
+                elif h_list[index] < 0:
+                    winnable_X -= 2
+            else:
+                #Center
+                if h_list[index] > 0:
+                    winnable_O -= 4
+                elif h_list[index] < 0:
+                    winnable_X -= 4
+        
+        H = winnable_X - winnable_O
+        return H
 
     def update_and_save_board_status(self,move_ret,symbol):
         self.backup_status_board = self.status_board[:]
