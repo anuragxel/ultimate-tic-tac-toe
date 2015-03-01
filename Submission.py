@@ -1,5 +1,13 @@
 import random
 import json
+import datetime
+import signal
+
+ENFORCED_TIME = 5
+hrst_table = json.load(open('yay.json'))
+
+class EnforcedTimeExecption(Exception):
+    pass
 
 class Player(object):
     '''
@@ -15,7 +23,8 @@ class Player(object):
         self.status_board = [] # '-', 'x', 'o'
         self.backup_status_board = []
         self.transposition_table = {}
-        self.heuristic_minimax_table = json.load(open('yay.json'))
+        self.heuristic_minimax_table = hrst_table
+        self.prev_time = datetime.datetime.now()
 
     def init(self):
         self.__init__()
@@ -39,7 +48,10 @@ class Player(object):
             7 : (3, 6),
             8 : (6, 6),
         }.get(block_number)
-    
+
+    def EnforcedTimeHandler(self):
+        raise EnforcedTimeExecption()
+
     def get_status_of_block(self,block_number,current_block,our_symbol):
         has_completed = False
         first_win=0     #0=none 1=me 2=other
@@ -620,17 +632,22 @@ class Player(object):
         if not cells:
             return self.free_move()
 
-        if self.number_of_moves < 10:
+        if self.number_of_moves < 8:
+            print "switching to level 4"
+            depth = 4
+        elif self.number_of_moves < 16:
             print "switching to level 5"
-            depth = 3
-        elif self.number_of_moves < 15:
-            print "switching to level 9"
             depth = 5
         else:
-            print "switching to level 11"
-            depth = 7
+            print "switching to level 6"
+            depth = 6
 
-        move, value = self.negamax_alpha_beta_transposition_table(opponent_move, depth, -99999, 99999, True) 
-        # move,value = self.min_max_with_alpha_beta_pruning(opponent_move,self.player_symbol,1)
-        # print move
+        print self.player_symbol
+        signal.signal(signal.SIGALRM, self.EnforcedTimeHandler)
+        signal.alarm(ENFORCED_TIME)
+        try:
+            move, value = self.negamax_alpha_beta_transposition_table(opponent_move, depth, -99999, 99999, True)
+        except EnforcedTimeExecption:
+            move = random.choice(cells)
+        signal.alarm(0)
         return move
