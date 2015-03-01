@@ -9,6 +9,9 @@ hrst_table = json.load(open('yay.json'))
 class EnforcedTimeExecption(Exception):
     pass
 
+def EnforcedTimeHandler(signum, frame):
+        raise EnforcedTimeExecption()
+
 class Player(object):
     '''
         Player Class Container.
@@ -49,11 +52,16 @@ class Player(object):
             8 : (6, 6),
         }.get(block_number)
 
-    def EnforcedTimeHandler(self):
-        raise EnforcedTimeExecption()
+    def make_block_str(self,board,block_number):
+        x,y = self.get_block_coords(block_number)
+        string = ""
+        for i in xrange(x,x+3):
+            for j in xrange(y,y+3):
+                string += board[i][j]
+        return string
 
     def get_status_of_block(self,block_number,current_block,our_symbol):
-        has_completed = False
+        has_completed = True
         first_win=0     #0=none 1=me 2=other
         x,y = self.get_block_coords(block_number)
 
@@ -62,8 +70,8 @@ class Player(object):
 
         for i in xrange(x,x+3):
             for j in xrange(y,y+3):
-                if current_block[x][y] == other_symbol or current_block[x][y] == our_symbol:
-                    has_completed = False
+                if not (current_block[x][y] == other_symbol or current_block[x][y] == our_symbol):
+                    has_completed = has_completed | False
 
         if current_block[x][y] == our_symbol and current_block[x + 1][y] == our_symbol and current_block[x + 2][y] == our_symbol:
             if first_win==0:
@@ -164,7 +172,6 @@ class Player(object):
                 blocks_allowed.remove(i)
 
         return blocks_allowed
-    
 
     def get_empty_out_of(self,blal):
         cells = []
@@ -219,7 +226,28 @@ class Player(object):
     def copy_current_board_elems(self,current_board,board_stat):
         self.actual_board = current_board[:]
         self.status_board = board_stat[:]
-        
+    
+    def get_move_from_number(block_number,move_number):
+        x,y = self.get_block_coords(block_number)
+        a,b = self.get_block_coords(move_number) # Just got very lazy there. :)
+        return ( x+(a/3), y+(b/3) )
+
+    def make_minimax_saved_move(self,blocks_allowed,cells):
+        acc_moves = []
+        for block_number in blocks_allowed:
+            string = self.make_block_str(self.actual_board,block_number)
+            try:
+                move_number = self.heuristic_minimax_table[string]
+                cell = self.get_move_from_number(block_number,move_number)
+                if cell in cells:
+                    acc_moves.append(cell)
+            except:
+                pass
+        try:
+            return random.choice(acc_moves)
+        except:
+            return random.choice(cells)
+
     def heuristic_score(self,board):
         #return random.randint(-10,10)
         """
@@ -228,12 +256,10 @@ class Player(object):
         #Calculate h values for each small board
         winnable_x = [8,8,8,8,8,8,8,8,8]
         winnable_o = [8,8,8,8,8,8,8,8,8]
-
         for index in xrange(9):
             block_coords = self.get_block_coords(index)
             x = block_coords[0]
             y = block_coords[1]
-            
             #Bad code but can't think of any better atm :/
             #4 corners
             if board[x][y] == 'x':
@@ -274,12 +300,10 @@ class Player(object):
                 winnable_o[index] -= 4
             elif board[x+1][y+1] == 'o':
                 winnable_x[index] -= 4
-
         #Populate h list
         h_list = []
         for index in xrange(9):
             h_list.append( winnable_x[index] - winnable_o[index] )
-
         #Calculate H using h values
         winnable_X = 8 #Winnable lines for X on bigger board
         winnable_O = 8 #Winnable lines for O on bigger board
@@ -302,7 +326,6 @@ class Player(object):
                     winnable_O -= 4
                 elif h_list[index] < 0:
                     winnable_X -= 4
-        
         H = winnable_X - winnable_O
         return H
 
@@ -448,6 +471,7 @@ class Player(object):
             if beta <= alpha:
                 break
         return (cells[0], v) # return the cell of the calling function 
+    
     # """
     def minimax_alpha_beta_transposition_table(self, opponent_move, depth, alpha, beta, is_maximizing_player):
         alpha_orig = alpha
@@ -569,49 +593,6 @@ class Player(object):
                         break
                 return (cells[0], v) # return the cell of the calling function
 
-    '''
-    def min_max_with_alpha_beta_pruning(self,opponent_move,our_symbol,depth):
-        blocks_allowed = self.get_permitted_blocks(opponent_move)
-        cells = self.get_empty_out_of(blocks_allowed)
-        game_status,game_score = self.game_completed(self.actual_board,'x')
-        if depth <= 0: 
-            return ((cells[0]),self.heuristic_score(self.actual_board));
-        elif game_status == 9: # Terminal Condition
-            return ((cells[0]),game_score) # -10or0or10 and move that can't be made
-        else:
-            alpha=beta=utility=((cells[0]), float("nan"))
-            if our_symbol == 'x': # TODO : remove the assumption that x is max-node
-                for cell in cells:
-                    x,y = cell
-                    self.actual_board[x][y] = 'x'
-                    self.update_and_save_board_status(cell,our_symbol)
-                    child = self.min_max_with_alpha_beta_pruning(cell,'o',depth-1)
-                    self.actual_board[x][y] = '-'
-                    self.reverse_board_status()
-                    if utility[1] == float("nan") or utility[1] < child[1]:
-                        utility = (cell,child[1])
-                    if alpha[1] == float("nan") or utility[1] > alpha[1]:
-                        alpha = utility
-                    if beta[1] != float("nan") and alpha[1] > beta[1]:
-                        break
-                return alpha
-            elif our_symbol == 'o':
-                for cell in cells:
-                    x,y = cell
-                    self.actual_board[x][y] = 'o'
-                    self.update_and_save_board_status(cell,our_symbolipy)
-                    child = self.min_max_with_alpha_beta_pruning(cell,'x',depth-1)
-                    self.actual_board[x][y] = '-'
-                    self.reverse_board_status()
-                    if utility[1] == float("nan") or utility[1] > child[1]:
-                        utility = (cell,child[1])
-                    if alpha[1] == float("nan") or utility[1] < beta[1]:
-                        beta = utility
-                    if beta[1] != float("nan") and alpha[1] > beta[1]:
-                        break
-                return beta
-    '''
-
     def free_move(self):
         print "Reached free move"
         return None
@@ -632,22 +613,23 @@ class Player(object):
         if not cells:
             return self.free_move()
 
-        if self.number_of_moves < 8:
+        if self.number_of_moves < 10:
             print "switching to level 4"
-            depth = 4
-        elif self.number_of_moves < 16:
+            depth = 3
+        elif self.number_of_moves < 18:
             print "switching to level 5"
             depth = 5
         else:
             print "switching to level 6"
-            depth = 6
+            depth = 7
 
         print self.player_symbol
-        signal.signal(signal.SIGALRM, self.EnforcedTimeHandler)
+        signal.signal(signal.SIGALRM, EnforcedTimeHandler)
         signal.alarm(ENFORCED_TIME)
         try:
-            move, value = self.negamax_alpha_beta_transposition_table(opponent_move, depth, -99999, 99999, True)
+            move, value = self.minimax_alpha_beta_transposition_table(opponent_move, depth, -99999, 99999, True)
         except EnforcedTimeExecption:
-            move = random.choice(cells)
+            move = self.make_minimax_saved_move(blocks_allowed,cells)
+            print "TLE\t\t\t\t" + str(move) 
         signal.alarm(0)
         return move
