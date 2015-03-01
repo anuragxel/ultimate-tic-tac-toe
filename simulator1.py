@@ -2,7 +2,6 @@ import sys
 import random
 import signal
 from actualSubmission import Player as Player1
-from team91 import Player as Player2 
 #Timer handler, helper function
 
 class TimedOutExc(Exception):
@@ -81,7 +80,6 @@ class Player1:
 		cells = get_empty_out_of(temp_board, blocks_allowed,temp_block)
 		return cells[random.randrange(len(cells))]
 """
-'''
 class Player2:
 	
 	def __init__(self):
@@ -137,7 +135,6 @@ class Player2:
 	# We get all the empty cells in allowed blocks. If they're all full, we get all the empty cells in the entire board.
 		cells = get_empty_out_of(temp_board,blocks_allowed,temp_block)
 		return cells[random.randrange(len(cells))]
-'''
 
 #Initializes the game
 def get_init_board_and_blockstatus():
