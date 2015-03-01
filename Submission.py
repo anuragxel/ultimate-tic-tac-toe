@@ -15,9 +15,17 @@ class Player(object):
         self.actual_board = [[]] # '-', 'x', 'o'
         self.status_board = [] # '-', 'x', 'o'
         self.backup_status_board = []
+        self.transposition_table = {}
 
     def init(self):
         self.__init__()
+
+    def make_board_str(self):
+        string = ""
+        for i in xrange(0,9):
+            for j in xrange(0,9):
+                string += self.actual_board[i][j]
+        return string
 
     def get_block_coords(self,block_number):
         return {
@@ -250,21 +258,35 @@ class Player(object):
             return self.opponent_symbol
 
     def negamax_alpha_beta_transposition_table(self, opponent_move, depth, alpha, beta, is_maximizing_player):
+        alpha_orig = alpha
         blocks_allowed = self.get_permitted_blocks(opponent_move)
         cells = self.get_empty_out_of(blocks_allowed)
-        # check termination conditions
         if not cells:
             if is_maximizing_player:
                 return (None, -99999)
             else:
                 return (None, 99999)
+        # Table lookup here
+        board_str = self.make_board_str()
+        try:
+            tt_depth,tt_flag,tt_value  = self.transposition_table[board_str]
+            if tt_depth >= depth:
+                if tt_flag == 0: # EXACT
+                    return (cells[0],tt_value)
+                elif tt_flag == -1: #LOWERBOUND
+                    alpha = max(alpha,tt_value)
+                elif tt_flag == 1: #UPPERBOUND
+                    beta = min(beta,tt_value)
+                if alpha >= beta:
+                    return (cells[0],tt_value)
+        except:
+            pass
+        # check termination conditions
         game_status, game_score = self.game_completed(self.actual_board, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
-        
         if depth == 0 and is_maximizing_player: # Or is terminal node
             return ((cells[0]), self.heuristic_score())
         if depth == 0 and not is_maximizing_player:
             return ((cells[0]), -self.heuristic_score())
-
         elif game_status == 9:
             return ((cells[0]), game_score)
         if is_maximizing_player:    
@@ -275,7 +297,7 @@ class Player(object):
             x,y = cell
             self.actual_board[x][y] = self._get_symbol_from_is_maximizing_player(is_maximizing_player)
             self.update_and_save_board_status(cell, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
-            child_node_values = self.real_alpha_beta(cell, depth - 1, -beta, -alpha, (not is_maximizing_player))
+            child_node_values = self.negamax_alpha_beta_transposition_table(cell, depth - 1, -beta, -alpha, (not is_maximizing_player))
             self.actual_board[x][y] = '-'
             self.reverse_board_status()
             v = child_node_values[1]
@@ -283,6 +305,16 @@ class Player(object):
                 alpha = v
             if beta <= alpha:
                 break
+        # Building States here
+        new_entry_value = v
+        if new_entry_value <= alpha_orig:
+            new_entry_flag = 1 #UPPERBOUND
+        elif new_entry_value >= beta:
+            new_entry_flag = -1 #LOWERBOUND
+        else:
+            new_entry_flag = 0 # EXACT
+        new_entry_depth = depth
+        self.transposition_table[board_str] = (new_entry_depth,new_entry_flag,new_entry_value)
         return (cells[0], v) # return the cell of the calling function 
 
 
@@ -312,7 +344,7 @@ class Player(object):
             x,y = cell
             self.actual_board[x][y] = self._get_symbol_from_is_maximizing_player(is_maximizing_player)
             self.update_and_save_board_status(cell, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
-            child_node_values = self.real_alpha_beta(cell, depth - 1, -beta, -alpha, (not is_maximizing_player))
+            child_node_values = self.negamax_alpha_beta(cell, depth - 1, -beta, -alpha, (not is_maximizing_player))
             self.actual_board[x][y] = '-'
             self.reverse_board_status()
             v = child_node_values[1]
@@ -323,7 +355,7 @@ class Player(object):
         return (cells[0], v) # return the cell of the calling function 
 
     # """
-    def real_alpha_beta(self, opponent_move, depth, alpha, beta, is_maximizing_player):
+    def minimax_alpha_beta(self, opponent_move, depth, alpha, beta, is_maximizing_player):
         blocks_allowed = self.get_permitted_blocks(opponent_move)
         cells = self.get_empty_out_of(blocks_allowed)
         # check termination conditions
@@ -345,7 +377,7 @@ class Player(object):
                     x,y = cell
                     self.actual_board[x][y] = self._get_symbol_from_is_maximizing_player(is_maximizing_player)
                     self.update_and_save_board_status(cell, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
-                    child_node_values = self.real_alpha_beta(cell, depth - 1, alpha, beta, False)
+                    child_node_values = self.minimax_alpha_beta(cell, depth - 1, alpha, beta, False)
                     self.actual_board[x][y] = '-'
                     self.reverse_board_status()
                     v = child_node_values[1]
@@ -360,7 +392,7 @@ class Player(object):
                     x,y = cell
                     self.actual_board[x][y] = self._get_symbol_from_is_maximizing_player(is_maximizing_player)
                     self.update_and_save_board_status(cell, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
-                    child_node_values = self.real_alpha_beta(cell, depth - 1, alpha, beta, True)
+                    child_node_values = self.minimax_alpha_beta(cell, depth - 1, alpha, beta, True)
                     self.actual_board[x][y] = '-'
                     self.reverse_board_status()
                     v = child_node_values[1]
@@ -370,7 +402,6 @@ class Player(object):
                         break
                 return (cells[0], v) # return the cell of the calling function
 
-    # """
     '''
     def min_max_with_alpha_beta_pruning(self,opponent_move,our_symbol,depth):
         blocks_allowed = self.get_permitted_blocks(opponent_move)
@@ -434,14 +465,17 @@ class Player(object):
         if not cells:
             return self.free_move()
 
-        if self.number_of_moves < 15:
-            print "switching to level 3"
-            depth = 3
-        else:
+        if self.number_of_moves < 10:
             print "switching to level 5"
-            depth = 3
+            depth = 5
+        elif self.number_of_moves < 15:
+            print "switching to level 9"
+            depth = 9
+        else:
+            print "switching to level 11"
+            depth = 11
 
-        move, value = self.negamax_alpha_beta(opponent_move, depth, -99999, 99999, True) 
+        move, value = self.negamax_alpha_beta_transposition_table(opponent_move, depth, -99999, 99999, True) 
         # move,value = self.min_max_with_alpha_beta_pruning(opponent_move,self.player_symbol,1)
         # print move
         return move

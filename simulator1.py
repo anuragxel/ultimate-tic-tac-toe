@@ -423,7 +423,7 @@ def simulate(obj1,obj2):
 	MESSAGE = ''
 
         #Make your move in 6 seconds!
-	TIMEALLOWED = 6
+	TIMEALLOWED = 60
 
 	print_lists(game_board, block_stat)
 
