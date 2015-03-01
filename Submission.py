@@ -253,21 +253,18 @@ class Player(object):
     def real_alpha_beta(self, opponent_move, depth, alpha, beta, is_maximizing_player):
         blocks_allowed = self.get_permitted_blocks(opponent_move)
         cells = self.get_empty_out_of(blocks_allowed)
-
         # check termination conditions
         if not cells:
             if is_maximizing_player:
                 return (None, -99999)
             else:
                 return (None, 99999)
-
         game_status, game_score = self.game_completed(self.actual_board, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
         if depth == 0: # Or is terminal node
             return ((cells[0]), self.heuristic_score())
         elif game_status == 9:
             return ((cells[0]), game_score)
         else:
-
             # begin to prune
             if is_maximizing_player:
                 v = -99999 # for the first case only
@@ -277,13 +274,12 @@ class Player(object):
                     self.update_and_save_board_status(cell, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
                     child_node_values = self.real_alpha_beta(cell, depth - 1, alpha, beta, False)
                     self.actual_board[x][y] = '-'
+                    self.reverse_board_status()
                     v = child_node_values[1]
                     if v > alpha:
                         alpha = v
-                    
                     if beta <= alpha:
                         break
-
                 return (cells[0], v) # return the cell of the calling function 
             else:
                 v = 99999 # for the first case only
@@ -293,13 +289,12 @@ class Player(object):
                     self.update_and_save_board_status(cell, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
                     child_node_values = self.real_alpha_beta(cell, depth - 1, alpha, beta, True)
                     self.actual_board[x][y] = '-'
+                    self.reverse_board_status()
                     v = child_node_values[1]
                     if beta < v:
                         beta = v
-
                     if beta <= alpha:
                         break
-
                 return (cells[0], v) # return the cell of the calling function
 
     # """
