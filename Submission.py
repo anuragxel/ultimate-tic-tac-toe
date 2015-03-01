@@ -367,9 +367,9 @@ class Player(object):
         # check termination conditions
         game_status, game_score = self.game_completed(self.actual_board, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
         if depth == 0 and is_maximizing_player: # Or is terminal node
-            return ((cells[0]), self.heuristic_score())
+            return ((cells[0]), self.heuristic_score(self.actual_board))
         if depth == 0 and not is_maximizing_player:
-            return ((cells[0]), -self.heuristic_score())
+            return ((cells[0]), -self.heuristic_score(self.actual_board))
         elif game_status == 9:
             return ((cells[0]), game_score)
         if is_maximizing_player:    
@@ -413,9 +413,9 @@ class Player(object):
         game_status, game_score = self.game_completed(self.actual_board, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
         
         if depth == 0 and is_maximizing_player: # Or is terminal node
-            return ((cells[0]), self.heuristic_score())
+            return ((cells[0]), self.heuristic_score(self.actual_board))
         if depth == 0 and not is_maximizing_player:
-            return ((cells[0]), -self.heuristic_score())
+            return ((cells[0]), -self.heuristic_score(self.actual_board))
 
         elif game_status == 9:
             return ((cells[0]), game_score)
@@ -464,7 +464,7 @@ class Player(object):
             pass
         game_status, game_score = self.game_completed(self.actual_board, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
         if depth == 0: # Or is terminal node
-            return ((cells[0]), self.heuristic_score())
+            return ((cells[0]), self.heuristic_score(self.actual_board))
         elif game_status == 9:
             return ((cells[0]), game_score)
         else:
@@ -521,7 +521,7 @@ class Player(object):
                 return (None, 99999)
         game_status, game_score = self.game_completed(self.actual_board, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
         if depth == 0: # Or is terminal node
-            return ((cells[0]), self.heuristic_score())
+            return ((cells[0]), self.heuristic_score(self.actual_board))
         elif game_status == 9:
             return ((cells[0]), game_score)
         else:
@@ -563,7 +563,7 @@ class Player(object):
         cells = self.get_empty_out_of(blocks_allowed)
         game_status,game_score = self.game_completed(self.actual_board,'x')
         if depth <= 0: 
-            return ((cells[0]),self.heuristic_score());
+            return ((cells[0]),self.heuristic_score(self.actual_board));
         elif game_status == 9: # Terminal Condition
             return ((cells[0]),game_score) # -10or0or10 and move that can't be made
         else:
@@ -622,13 +622,13 @@ class Player(object):
 
         if self.number_of_moves < 10:
             print "switching to level 5"
-            depth = 5
+            depth = 3
         elif self.number_of_moves < 15:
             print "switching to level 9"
-            depth = 9
+            depth = 5
         else:
             print "switching to level 11"
-            depth = 11
+            depth = 7
 
         move, value = self.negamax_alpha_beta_transposition_table(opponent_move, depth, -99999, 99999, True) 
         # move,value = self.min_max_with_alpha_beta_pruning(opponent_move,self.player_symbol,1)
