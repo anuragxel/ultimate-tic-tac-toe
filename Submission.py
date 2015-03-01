@@ -1,4 +1,5 @@
 import random
+import json
 
 class Player(object):
     '''
@@ -14,6 +15,7 @@ class Player(object):
         self.status_board = [] # '-', 'x', 'o'
         self.backup_status_board = []
         self.transposition_table = {}
+        self.heuristic_minimax_table = json.load(open('yay.json'))
 
     def init(self):
         self.__init__()
