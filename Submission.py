@@ -14,8 +14,6 @@ class Player(object):
         Player Class Container.
     '''
     def __init__(self):
-        self.H = 0
-        self.h = [0,0,0,0,0,0,0,0,0]
         self.number_of_moves = 0
         self.player_symbol = None
         self.opponent_symbol = None
@@ -221,13 +219,16 @@ class Player(object):
         self.status_board = board_stat[:]
         
     def heuristic_score(self,board):
-        #return random.randint(-10,10)
         """
         Computes heuristic_score for the passed board configuration
         """
         #Calculate h values for each small board
         winnable_x = [8,8,8,8,8,8,8,8,8]
+        lines_x = [[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1]]
         winnable_o = [8,8,8,8,8,8,8,8,8]
+        lines_o = [[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1]]
 
         for index in xrange(9):
             block_coords = self.get_block_coords(index)
@@ -237,43 +238,169 @@ class Player(object):
             #Bad code but can't think of any better atm :/
             #4 corners
             if board[x][y] == 'x':
-                winnable_o[index] -= 3
+                if lines_o[0][0] == 1:
+                    lines_o[0][0] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][3] == 1:
+                    lines_o[0][3] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][6] == 1:
+                    lines_o[0][6] = 0
+                    winnable_o[index] -= 1
             elif board[x][y] == 'o':
-                winnable_x[index] -= 3
+                if lines_x[0][0] == 1:
+                    lines_x[0][0] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][3] == 1:
+                    lines_x[0][3] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][6] == 1:
+                    lines_x[0][6] = 0
+                    winnable_x[index] -= 1
             if board[x+2][y] == 'x':
-                winnable_o[index] -= 3
+                if lines_o[0][0] == 1:
+                    lines_o[0][0] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][5] == 1:
+                    lines_o[0][5] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][7] == 1:
+                    lines_o[0][7] = 0
+                    winnable_o[index] -= 1
             elif board[x+2][y] == 'o':
-                winnable_x[index] -= 3
+                if lines_x[0][0] == 1:
+                    lines_x[0][0] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][5] == 1:
+                    lines_x[0][5] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][7] == 1:
+                    lines_x[0][7] = 0
+                    winnable_x[index] -= 1
             if board[x][y+2] == 'x':
-                winnable_o[index] -= 3
+                if lines_o[0][2] == 1:
+                    lines_o[0][2] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][3] == 1:
+                    lines_o[0][3] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][7] == 1:
+                    lines_o[0][7] = 0
+                    winnable_o[index] -= 1
             elif board[x][y+2] == 'o':
-                winnable_x[index] -= 3
+                if lines_x[0][2] == 1:
+                    lines_x[0][2] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][3] == 1:
+                    lines_x[0][3] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][7] == 1:
+                    lines_x[0][7] = 0
+                    winnable_x[index] -= 1
             if board[x+2][y+2] == 'x':
-                winnable_o[index] -= 3
+                if lines_o[0][2] == 1:
+                    lines_o[0][2] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][5] == 1:
+                    lines_o[0][5] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][6] == 1:
+                    lines_o[0][6] = 0
+                    winnable_o[index] -= 1
             elif board[x+2][y+2] == 'o':
-                winnable_x[index] -= 3
+                if lines_x[0][2] == 1:
+                    lines_x[0][2] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][5] == 1:
+                    lines_x[0][5] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][6] == 1:
+                    lines_x[0][6] = 0
+                    winnable_x[index] -= 1
             #4 sides
             if board[x+1][y] == 'x':
-                winnable_o[index] -= 2
+                if lines_o[0][0] == 1:
+                    lines_o[0][0] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][4] == 1:
+                    lines_o[0][4] = 0
+                    winnable_o[index] -= 1
             elif board[x+1][y] == 'o':
-                winnable_x[index] -= 2
+                if lines_x[0][0] == 1:
+                    lines_x[0][0] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][4] == 1:
+                    lines_x[0][4] = 0
+                    winnable_x[index] -= 1
             if board[x][y+1] == 'x':
-                winnable_o[index] -= 2
+                if lines_o[0][1] == 1:
+                    lines_o[0][1] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][3] == 1:
+                    lines_o[0][3] = 0
+                    winnable_o[index] -= 1
             elif board[x][y+1] == 'o':
-                winnable_x[index] -= 2
+                if lines_x[0][1] == 1:
+                    lines_x[0][1] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][3] == 1:
+                    lines_x[0][3] = 0
+                    winnable_x[index] -= 1
             if board[x+2][y+1] == 'x':
-                winnable_o[index] -= 2
+                if lines_o[0][1] == 1:
+                    lines_o[0][1] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][5] == 1:
+                    lines_o[0][5] = 0
+                    winnable_o[index] -= 1
             elif board[x+2][y+1] == 'o':
-                winnable_x[index] -= 2
+                if lines_x[0][1] == 1:
+                    lines_x[0][1] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][5] == 1:
+                    lines_x[0][5] = 0
+                    winnable_x[index] -= 1
             if board[x+1][y+2] == 'x':
-                winnable_o[index] -= 2
+                if lines_o[0][2] == 1:
+                    lines_o[0][2] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][4] == 1:
+                    lines_o[0][4] = 0
+                    winnable_o[index] -= 1
             elif board[x+1][y+2] == 'o':
-                winnable_x[index] -= 2
+                if lines_x[0][2] == 1:
+                    lines_x[0][2] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][4] == 1:
+                    lines_x[0][4] = 0
+                    winnable_x[index] -= 1
             #Center
             if board[x+1][y+1] == 'x':
-                winnable_o[index] -= 4
+                if lines_o[0][1] == 1:
+                    lines_o[0][1] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][4] == 1:
+                    lines_o[0][4] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][6] == 1:
+                    lines_o[0][6] = 0
+                    winnable_o[index] -= 1
+                if lines_o[0][7] == 1:
+                    lines_o[0][7] = 0
+                    winnable_o[index] -= 1
             elif board[x+1][y+1] == 'o':
-                winnable_x[index] -= 4
+                if lines_x[0][1] == 1:
+                    lines_x[0][1] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][4] == 1:
+                    lines_x[0][4] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][6] == 1:
+                    lines_x[0][6] = 0
+                    winnable_x[index] -= 1
+                if lines_x[0][7] == 1:
+                    lines_x[0][7] = 0
+                    winnable_x[index] -= 1
 
         #Populate h list
         h_list = []
@@ -304,6 +431,9 @@ class Player(object):
                     winnable_X -= 4
         
         H = winnable_X - winnable_O
+
+
+
         return H
 
     def update_and_save_board_status(self,move_ret,symbol):
@@ -633,14 +763,14 @@ class Player(object):
             return self.free_move()
 
         if self.number_of_moves < 8:
-            print "switching to level 4"
-            depth = 4
+            print "switching to level 3"
+            depth = 3
         elif self.number_of_moves < 16:
             print "switching to level 5"
-            depth = 5
+            depth = 3
         else:
-            print "switching to level 6"
-            depth = 6
+            print "switching to level 7"
+            depth = 5
 
         print self.player_symbol
         signal.signal(signal.SIGALRM, self.EnforcedTimeHandler)
