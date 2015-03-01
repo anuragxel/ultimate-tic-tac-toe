@@ -249,6 +249,38 @@ class Player(object):
         else:
             return self.opponent_symbol
 
+    def negamax_alpha_beta(self, opponent_move, depth, alpha, beta, is_maximizing_player):
+        blocks_allowed = self.get_permitted_blocks(opponent_move)
+        cells = self.get_empty_out_of(blocks_allowed)
+        # check termination conditions
+        if not cells:
+            if is_maximizing_player:
+                return (None, -99999)
+            else:
+                return (None, 99999)
+        game_status, game_score = self.game_completed(self.actual_board, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
+        if depth == 0: # Or is terminal node
+            return ((cells[0]), self.heuristic_score())
+        elif game_status == 9:
+            return ((cells[0]), game_score)
+        if is_maximizing_player:    
+            v = -99999 # for the first case only
+        else:
+            v = 99999
+        for cell in cells:
+            x,y = cell
+            self.actual_board[x][y] = self._get_symbol_from_is_maximizing_player(is_maximizing_player)
+            self.update_and_save_board_status(cell, self._get_symbol_from_is_maximizing_player(is_maximizing_player))
+            child_node_values = self.real_alpha_beta(cell, depth - 1, -beta, -alpha, (not is_maximizing_player))
+            self.actual_board[x][y] = '-'
+            self.reverse_board_status()
+            v = child_node_values[1]
+            if v > alpha:
+                alpha = v
+            if beta <= alpha:
+                break
+        return (cells[0], v) # return the cell of the calling function 
+
     # """
     def real_alpha_beta(self, opponent_move, depth, alpha, beta, is_maximizing_player):
         blocks_allowed = self.get_permitted_blocks(opponent_move)
@@ -298,6 +330,7 @@ class Player(object):
                 return (cells[0], v) # return the cell of the calling function
 
     # """
+    '''
     def min_max_with_alpha_beta_pruning(self,opponent_move,our_symbol,depth):
         blocks_allowed = self.get_permitted_blocks(opponent_move)
         cells = self.get_empty_out_of(blocks_allowed)
@@ -338,6 +371,7 @@ class Player(object):
                     if beta[1] != float("nan") and alpha[1] > beta[1]:
                         break
                 return beta
+    '''
 
     def free_move(self):
         print "Reached free move"
@@ -366,7 +400,7 @@ class Player(object):
             print "switching to level 5"
             depth = 3
 
-        move, value = self.real_alpha_beta(opponent_move, depth, -99999, 99999, True) 
+        move, value = self.negamax_alpha_beta(opponent_move, depth, -99999, 99999, True) 
         # move,value = self.min_max_with_alpha_beta_pruning(opponent_move,self.player_symbol,1)
         # print move
         return move
