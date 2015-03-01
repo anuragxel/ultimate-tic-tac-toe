@@ -300,7 +300,7 @@ class Player(object):
             child_node_values = self.negamax_alpha_beta_transposition_table(cell, depth - 1, -beta, -alpha, (not is_maximizing_player))
             self.actual_board[x][y] = '-'
             self.reverse_board_status()
-            v = child_node_values[1]
+            v = -child_node_values[1]
             if v > alpha:
                 alpha = v
             if beta <= alpha:
@@ -347,7 +347,7 @@ class Player(object):
             child_node_values = self.negamax_alpha_beta(cell, depth - 1, -beta, -alpha, (not is_maximizing_player))
             self.actual_board[x][y] = '-'
             self.reverse_board_status()
-            v = child_node_values[1]
+            v = -child_node_values[1]
             if v > alpha:
                 alpha = v
             if beta <= alpha:
